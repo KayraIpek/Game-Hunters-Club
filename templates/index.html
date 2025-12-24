@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hunter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f0f12; /* Derin Siyah/Lacivert */
+            color: #e0e0e0;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* --- HEADER (BAŞLIK & TARİH) --- */
+        .header-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        /* Renkli, Hareketli Başlık */
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(90deg, #ff00cc, #333399, #00d4ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientAnim 3s linear infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        @keyframes gradientAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Tarih Kutusu */
+        .timer-box {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: #00bcd4;
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* --- KARTLAR --- */
+        h2 { 
+            border-left: 5px solid #00bcd4; 
+            padding-left: 15px; 
+            margin-top: 50px; 
+            color: #fff; 
+            font-family: 'Orbitron', sans-serif; 
+            text-transform: uppercase;
+        }
+        
+        .game-list { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 25px; 
+        }
+        
+        .game-card {
+            background: #1a1a1f;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a30;
+            display: flex;
+            flex-direction: column;
+        }
+        .game-card:hover { transform: translateY(-7px); border-color: #00bcd4; box-shadow: 0 10px 20px rgba(0, 188, 212, 0.15); }
+        
+        .game-img { width: 100%; height: 140px; object-fit: cover; }
+        
+        .game-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .game-title { 
+            font-size: 1.1em; 
+            font-weight: 500; 
+            margin-bottom: 10px; 
+            color: #fff; 
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .game-title:hover { color: #ff00cc; }
+        
+        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .game-price { color: #00e676; font-weight: bold; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
+        
+        .store-badge { font-size: 0.7em; padding: 4px 8px; border-radius: 4px; color: white; text-transform: uppercase; font-weight: bold; }
+        .steam { background: linear-gradient(45deg, #171a21, #2a475e); }
+        .itch { background: linear-gradient(45deg, #fa5c5c, #d32f2f); }
+        .epic { background: linear-gradient(45deg, #333, #555); }
+
+        /* GİZLEME VE BUTON */
+        .hidden-item { display: none; }
+
+        .load-more-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 50px;
+            background: transparent;
+            color: #00bcd4;
+            border: 2px solid #00bcd4;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .load-more-btn:hover { background-color: #00bcd4; color: #000; box-shadow: 0 0 20px rgba(0, 188, 212, 0.4); }
+        .load-more-btn.disabled { border-color: #555; color: #555; cursor: default; box-shadow: none; background: transparent; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="header-container">
+        <h1 class="main-title">GAME HUNTER</h1>
+        <div class="timer-box">
+            <span style="opacity: 0.7;">📅 SON GÜNCELLEME:</span>
+            <span style="color: #fff; font-weight: bold;">{{ current_time }}</span>
+        </div>
+    </div>
+
+    <h2><span style="color:#66c0f4">Steam</span> Fırsatları</h2>
+    <div class="game-list" id="steam-list">
+        {% for game in steam_games %}
+            <div class="game-card {% if loop.index > 10 %}hidden-item{% endif %}">
+                <img src="{{ game.image }}" class="game-img" loading="lazy" onerror="this.src='https://via.placeholder.com/250x140?text=No+Image'">
+                <div class="game-info">
+                    <a href="{{ game.link }}" target="_blank" class="game-title">{{ game.name }}</a>
+                    <div class="card-footer">
+                        <span class="game-price">{{ game.price }}</span>
+                        <span class="store-badge steam">Steam</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p style="color: #777;">Steam verisi alınamadı.</p>
+        {% endfor %}
+    </div>
+    {% if steam_games|length > 10 %}
+        <button class="load-more-btn" onclick="loadMore('steam-list', this)">DAHA FAZLA GÖSTER</button>
+    {% endif %}
+
+    <h2><span style="color:#fa5c5c">Itch.io</span> Indie</h2>
+    <div class="game-list" id="itch-list">
+        {% for game in itch_games %}
+            <div class="game-card {% if loop.index > 10 %}hidden-item{% endif %}">
+                <img src="{{ game.image }}" class="game-img" loading="lazy" onerror="this.src='https://via.placeholder.com/250x140?text=Indie'">
+                <div class="game-info">
+                    <a href="{{ game.link }}" target="_blank" class="game-title">{{ game.name }}</a>
+                    <div class="card-footer">
+                        <span class="game-price">{{ game.price }}</span>
+                        <span class="store-badge itch">Itch</span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if itch_games|length > 10 %}
+        <button class="load-more-btn" onclick="loadMore('itch-list', this)">DAHA FAZLA GÖSTER</button>
+    {% endif %}
+
+    <h2><span style="color:#fff">Epic Games</span></h2>
+    <div class="game-list" id="epic-list">
+        {% for game in epic_games %}
+            <div class="game-card {% if loop.index > 10 %}hidden-item{% endif %}">
+                <img src="{{ game.image }}" class="game-img" loading="lazy" onerror="this.src='https://via.placeholder.com/250x140?text=Epic'">
+                <div class="game-info">
+                    <a href="{{ game.link }}" target="_blank" class="game-title">{{ game.name }}</a>
+                    <div class="card-footer">
+                        <span class="game-price">{{ game.price }}</span>
+                        <span class="store-badge epic">Epic</span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if epic_games|length > 10 %}
+        <button class="load-more-btn" onclick="loadMore('epic-list', this)">DAHA FAZLA GÖSTER</button>
+    {% endif %}
+</div>
+
+<script>
+    // LOAD MORE FONKSİYONU
+    function loadMore(listId, btn) {
+        var container = document.getElementById(listId);
+        var hiddenItems = container.querySelectorAll('.hidden-item');
+        var limit = 10;
+        var count = 0;
+
+        for (var i = 0; i < hiddenItems.length; i++) {
+            if (count < limit) {
+                hiddenItems[i].classList.remove('hidden-item');
+                count++;
+            } else {
+                break;
+            }
+        }
+
+        if (container.querySelectorAll('.hidden-item').length === 0) {
+            btn.textContent = "LİSTE SONU";
+            btn.classList.add('disabled');
+            btn.disabled = true;
+        }
+    }
+</script>
+
+</body>
+</html>
