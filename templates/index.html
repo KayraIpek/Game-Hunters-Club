@@ -153,7 +153,8 @@
     <div class="game-list" id="steam-list">
         {% for game in steam_games %}
             <div class="game-card {% if loop.index > 10 %}hidden-item{% endif %}">
-                <img src="{{ game.image }}" class="game-img" loading="lazy" onerror="this.src='https://via.placeholder.com/250x140?text=No+Image'">
+                <img src="{{ game.image }}" class="game-img" loading="lazy" 
+                     onerror="this.src='https://placehold.co/250x140/171a21/ffffff?text=STEAM+GAME&font=roboto'">
                 <div class="game-info">
                     <a href="{{ game.link }}" target="_blank" class="game-title">{{ game.name }}</a>
                     <div class="card-footer">
@@ -174,7 +175,8 @@
     <div class="game-list" id="itch-list">
         {% for game in itch_games %}
             <div class="game-card {% if loop.index > 10 %}hidden-item{% endif %}">
-                <img src="{{ game.image }}" class="game-img" loading="lazy" onerror="this.src='https://via.placeholder.com/250x140?text=Indie'">
+                <img src="{{ game.image }}" class="game-img" loading="lazy" 
+                     onerror="this.src='https://placehold.co/250x140/fa5c5c/ffffff?text=INDIE+GAME&font=roboto'">
                 <div class="game-info">
                     <a href="{{ game.link }}" target="_blank" class="game-title">{{ game.name }}</a>
                     <div class="card-footer">
@@ -193,7 +195,8 @@
     <div class="game-list" id="epic-list">
         {% for game in epic_games %}
             <div class="game-card {% if loop.index > 10 %}hidden-item{% endif %}">
-                <img src="{{ game.image }}" class="game-img" loading="lazy" onerror="this.src='https://via.placeholder.com/250x140?text=Epic'">
+                <img src="{{ game.image }}" class="game-img" loading="lazy" 
+                     onerror="this.src='https://placehold.co/250x140/333333/ffffff?text=EPIC+GAME&font=roboto'">
                 <div class="game-info">
                     <a href="{{ game.link }}" target="_blank" class="game-title">{{ game.name }}</a>
                     <div class="card-footer">
@@ -210,7 +213,6 @@
 </div>
 
 <script>
-    // LOAD MORE FONKSİYONU
     function loadMore(listId, btn) {
         var container = document.getElementById(listId);
         var hiddenItems = container.querySelectorAll('.hidden-item');
