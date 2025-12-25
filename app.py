@@ -153,7 +153,7 @@ def get_epic_data():
                 promotions = game.get('promotions')
                 if promotions and promotions.get('promotionalOffers') and len(promotions['promotionalOffers']) > 0:
                     title = game['title']
-                    slug = game.get('productSlug') or game.get('urlSlug')
+                    slug = game.get('productSlug') or game.get('urlSlug') # Oyun linki gibi...
                     
                     if not slug:
                          for attr in game.get('customAttributes', []):
