@@ -200,7 +200,7 @@ def get_epic_data():
 
     return games_list
 
-@app.route('/') # Ana sayfa + Fonksiyon
+@app.route('/')
 def index():
     print("\n--- Game Hunter Taraması Başlıyor... ---")
     start_time = time.time()
