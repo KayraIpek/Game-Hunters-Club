@@ -98,7 +98,8 @@ def get_itchio_data():
             if response.status_code == 200:
                 soup = BeautifulSoup(response.content, 'html.parser')
                 cells = soup.find_all('div', class_='game_cell')
-                
+                # Oyun kartı oluştur. Kart boşsa kodu kır.
+
                 if not cells: break
                 
                 for cell in cells:
