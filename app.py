@@ -3,11 +3,12 @@ import requests
 from bs4 import BeautifulSoup
 import time
 from concurrent.futures import ThreadPoolExecutor # Hızlandırma motorumuz
-from datetime import datetime # Tarih/Saat için
+# Aynı anda veri çekimi yapabilmek için
+from datetime import datetime # Tarih/Saat için (Güncellik)
 
 app = Flask(__name__)
 
-# Tarayıcı gibi görünmek için gerekli kimlik bilgisi
+# Tarayıcı gibi görünmek için gerekli kimlik bilgisi (Fake ID)
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     'Accept-Language': 'en-US,en;q=0.9',
@@ -24,8 +25,9 @@ def get_steam_data():
     
     start = 0
     page = 1
+    # En baştan başlayarak sayfaları taramak için
 
-    while page <= max_pages:
+    while page <= max_pages:  # Türkçe içeriklerden oluşan verileri her seferinde 50 tane olacak şekilde 3 sayfa boyunca çek.
         params = {
             'specials': 1,
             'l': 'turkish',
@@ -35,33 +37,34 @@ def get_steam_data():
         }
         
         try:
-            response = requests.get(base_url, headers=HEADERS, params=params, timeout=10)
+            response = requests.get(base_url, headers=HEADERS, params=params, timeout=10)  # "Timeout" duruma göre değiştir
             if response.status_code == 200:
                 data = response.json()
                 html_content = data.get('results_html', '')
                 
                 soup = BeautifulSoup(html_content, 'html.parser')
-                rows = soup.select('a.search_result_row')
+                rows = soup.select('a.search_result_row') # Oyunları kaydet
                 
                 if not rows: break
 
                 for row in rows:
-                    try:
-                        title = row.find('span', class_='title').text.strip()
+                    try:   # Temizlik...
+                        title = row.find('span', class_='title').text.strip()  
                         price_div = row.find('div', class_='discount_final_price')
                         price = price_div.text.strip() if price_div else "Fiyat Yok"
                         
                         # --- LİNK DÜZELTME (Fix) ---
-                        raw_link = row.get('href', '')
+                        raw_link = row.get('href', '')  # hypertext reference
                         link = raw_link.split('?')[0] if raw_link else ""
-                        
+
+                        # Makyaj
                         img_tag = row.find('img')
                         img_url = img_tag.get('src') if img_tag else ""
                         
                         games_list.append({
                             'name': title, 'price': price, 'image': img_url, 'link': link, 'store': 'steam'
                         })
-                    except: continue
+                    except: continue  # Oyun atla
                 
                 start += count_per_page
                 page += 1
@@ -85,6 +88,7 @@ def get_itchio_data():
 
     session = requests.Session()
     session.headers.update(HEADERS)
+    # İstemcinin sunucuya giriş yapıp sunucudan çıkış yaptığı aralık.
 
     while current_page <= max_pages:
         try:
@@ -218,4 +222,5 @@ def index():
     return render_template('index.html', steam_games=steam, itch_games=itch, epic_games=epic, current_time=simdi)
 
 if __name__ == '__main__':
+
     app.run(debug=True, port=5001)
